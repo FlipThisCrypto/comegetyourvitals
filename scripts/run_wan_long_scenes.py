@@ -23,8 +23,11 @@ from long_scene_contract import (
     Scene,
     continuity_steps,
     extract_last_frame,
+    identity_directive,
+    load_character_registry,
     load_manifest,
     performance_directive,
+    validate_scene_cast,
     video_matches,
 )
 from long_scene_qa import analyze_segment, approval_status, archive_attempt
@@ -53,11 +56,15 @@ def post_json(url: str, payload: dict[str, object]) -> None:
         pass
 
 
-def request_for(scene: Scene, beat_index: int, gpu: int, start_asset: str, end_asset: str) -> FirstLastFrameGenerationRequest:
+def request_for(
+    scene: Scene, beat_index: int, gpu: int, start_asset: str, end_asset: str,
+    registry: dict[str, dict[str, object]],
+) -> FirstLastFrameGenerationRequest:
     beat = scene.beats[beat_index]
     provider_id = f"wan22-flf-gpu{gpu}"
     prompt = (
         "One uninterrupted ten-second passage from a polished 3D animated underwater nursing-station scene. "
+        f"{identity_directive(scene, registry)} The visual focus in this passage is {', '.join(beat.focus)}. "
         f"{beat.prompt} {performance_directive(beat.singing)} "
         "Maintain one continuous timeline with natural-speed movement and coherent weight. Preserve every established character's "
         "face, species, body proportions, uniform, accessories and screen position. Keep hands, fins, tails, hair and props readable. "
@@ -85,7 +92,9 @@ def request_for(scene: Scene, beat_index: int, gpu: int, start_asset: str, end_a
     )
 
 
-async def generate_scene_natives(scene: Scene, gpu: int, args: argparse.Namespace) -> None:
+async def generate_scene_natives(
+    scene: Scene, gpu: int, registry: dict[str, dict[str, object]], args: argparse.Namespace,
+) -> None:
     endpoint = args.endpoint_gpu0 if gpu == 0 else args.endpoint_gpu1
     scene_directory = args.output_directory / scene.scene_id
     scene_directory.mkdir(parents=True, exist_ok=True)
@@ -105,7 +114,9 @@ async def generate_scene_natives(scene: Scene, gpu: int, args: argparse.Namespac
         native = segment_directory / "native-8fps.mp4"
         delivery = segment_directory / "delivery-60fps.mp4"
         if not native.is_file() and not video_matches(delivery, seconds=SEGMENT_SECONDS):
-            request = request_for(scene, step.index, gpu, f"{scene.scene_id}-{step.index}-start", f"{scene.scene_id}-{step.index}-end")
+            request = request_for(
+                scene, step.index, gpu, f"{scene.scene_id}-{step.index}-start", f"{scene.scene_id}-{step.index}-end", registry
+            )
             await provider.generate(
                 ResolvedFirstLastFrameRequest(
                     snapshot=request,
@@ -179,19 +190,23 @@ async def deliver_scene(scene: Scene, rife: RifeCliInterpolationProvider, args: 
     return []
 
 
-async def worker(gpu: int, queue: asyncio.Queue[Scene | None], args: argparse.Namespace) -> None:
+async def worker(
+    gpu: int, queue: asyncio.Queue[Scene | None], registry: dict[str, dict[str, object]], args: argparse.Namespace,
+) -> None:
     while True:
         scene = await queue.get()
         try:
             if scene is None:
                 return
-            await generate_scene_natives(scene, gpu, args)
+            await generate_scene_natives(scene, gpu, registry, args)
         finally:
             queue.task_done()
 
 
 async def execute(args: argparse.Namespace) -> None:
     scenes = load_manifest(args.manifest)
+    registry = load_character_registry(args.character_registry)
+    validate_scene_cast(scenes, registry)
     for scene in scenes:
         for frame in (scene.start_frame, *(beat.end_frame for beat in scene.beats)):
             if not frame.is_file():
@@ -212,7 +227,7 @@ async def execute(args: argparse.Namespace) -> None:
         queue.put_nowait(scene)
     queue.put_nowait(None)
     queue.put_nowait(None)
-    await asyncio.gather(worker(0, queue, args), worker(1, queue, args))
+    await asyncio.gather(worker(0, queue, registry, args), worker(1, queue, registry, args))
     for endpoint in (args.endpoint_gpu0, args.endpoint_gpu1):
         try:
             post_json(endpoint.rstrip("/") + "/free", {"unload_models": True, "free_memory": True})
@@ -235,6 +250,7 @@ def main() -> None:
     parser.add_argument("output_directory", type=Path)
     parser.add_argument("--workflow", type=Path, required=True)
     parser.add_argument("--rife-runtime", type=Path, required=True)
+    parser.add_argument("--character-registry", type=Path, default=Path("character-registry.json"))
     parser.add_argument("--endpoint-gpu0", default="http://127.0.0.1:8190")
     parser.add_argument("--endpoint-gpu1", default="http://127.0.0.1:8189")
     parser.add_argument("--rerun", action="append", default=[], help="archive and regenerate scene-id:segment-number")

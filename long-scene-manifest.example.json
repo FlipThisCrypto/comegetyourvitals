@@ -4,26 +4,35 @@
     {
       "scene_id": "nurses-station-flashmob",
       "start_frame": "keyframes/flashmob-00.png",
+      "location": "center nurses station, fixed residential-left and detox-right geography",
+      "cast": ["NURSE_ORCA", "NURSE_RAINBOW", "NURSE_PUFFER", "NURSE_TANG"],
+      "singer": "NURSE_RAINBOW",
+      "camera_axis": "viewer-facing side of the nurses station without crossing the line",
+      "wardrobe_lock": "orca, rainbow, puffer and tang nurses retain their canonical blue scrubs and ID badges",
       "beats": [
         {
           "prompt": "The nurses notice the rhythm and exchange amused looks while continuing their work; the camera makes a gentle lateral move.",
           "end_frame": "keyframes/flashmob-10.png",
-          "singing": false
+          "singing": false,
+          "focus": ["NURSE_ORCA", "NURSE_PUFFER"]
         },
         {
           "prompt": "Two nurses begin a playful synchronized step in the background while the foreground nurse finishes checking the monitor.",
           "end_frame": "keyframes/flashmob-20.png",
-          "singing": false
+          "singing": false,
+          "focus": ["NURSE_PUFFER", "NURSE_TANG"]
         },
         {
           "prompt": "The female lead enters with the microphone and performs energetically as the background dance grows into a coordinated flash mob.",
           "end_frame": "keyframes/flashmob-30.png",
-          "singing": true
+          "singing": true,
+          "focus": ["NURSE_RAINBOW", "NURSE_PUFFER", "NURSE_TANG"]
         },
         {
           "prompt": "The full female nurse ensemble completes a joyful final dance phrase, then lands together in a clean readable pose.",
           "end_frame": "keyframes/flashmob-40.png",
-          "singing": true
+          "singing": true,
+          "focus": ["NURSE_RAINBOW", "NURSE_PUFFER", "NURSE_TANG", "NURSE_ORCA"]
         }
       ]
     }
