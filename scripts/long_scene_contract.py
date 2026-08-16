@@ -1,0 +1,141 @@
+#!/usr/bin/env python3
+"""Dependency-free contracts and timing validation for long generated scenes."""
+
+from __future__ import annotations
+
+import json
+import re
+import subprocess
+from dataclasses import dataclass
+from pathlib import Path
+
+
+SEGMENT_SECONDS = 10
+SEGMENTS_PER_SCENE = 4
+DELIVERY_FPS = 60
+SCENE_SECONDS = SEGMENT_SECONDS * SEGMENTS_PER_SCENE
+SCENE_FRAMES = SCENE_SECONDS * DELIVERY_FPS
+SCENE_ID = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+
+
+@dataclass(frozen=True)
+class Beat:
+    prompt: str
+    end_frame: Path
+    singing: bool
+
+
+@dataclass(frozen=True)
+class Scene:
+    scene_id: str
+    start_frame: Path
+    beats: tuple[Beat, ...]
+
+
+@dataclass(frozen=True)
+class ContinuityStep:
+    index: int
+    start_frame: Path
+    end_frame: Path
+    continuity_frame: Path
+
+
+def performance_directive(singing: bool) -> str:
+    if singing:
+        return (
+            "The female lead performs the vocal with controlled mouth shapes and expressive full-body movement. "
+            "Only the female lead sings or holds a microphone."
+        )
+    return (
+        "This is a non-singing story and dance passage. No character lip-syncs or holds a microphone; "
+        "mouths stay closed or make brief natural non-vocal reactions."
+    )
+
+
+def load_manifest(path: Path) -> tuple[Scene, ...]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if payload.get("schema_version") != 1:
+        raise ValueError("manifest schema_version must be 1")
+    raw_scenes = payload.get("scenes")
+    if not isinstance(raw_scenes, list) or not raw_scenes:
+        raise ValueError("manifest must contain at least one scene")
+    root = path.parent
+    scenes: list[Scene] = []
+    seen: set[str] = set()
+    for raw in raw_scenes:
+        scene_id = raw.get("scene_id")
+        if not isinstance(scene_id, str) or not SCENE_ID.fullmatch(scene_id):
+            raise ValueError(f"invalid scene_id: {scene_id!r}")
+        if scene_id in seen:
+            raise ValueError(f"duplicate scene_id: {scene_id}")
+        seen.add(scene_id)
+        raw_beats = raw.get("beats")
+        if not isinstance(raw_beats, list) or len(raw_beats) != SEGMENTS_PER_SCENE:
+            raise ValueError(f"scene {scene_id} must contain exactly {SEGMENTS_PER_SCENE} beats")
+        beats: list[Beat] = []
+        for index, raw_beat in enumerate(raw_beats):
+            prompt = raw_beat.get("prompt")
+            singing = raw_beat.get("singing")
+            end_frame = raw_beat.get("end_frame")
+            if not isinstance(prompt, str) or not prompt.strip():
+                raise ValueError(f"scene {scene_id} beat {index} requires a prompt")
+            if not isinstance(singing, bool):
+                raise ValueError(f"scene {scene_id} beat {index} singing must be boolean")
+            if not isinstance(end_frame, str) or not end_frame:
+                raise ValueError(f"scene {scene_id} beat {index} requires an end_frame")
+            beats.append(Beat(prompt.strip(), (root / end_frame).resolve(), singing))
+        start_frame = raw.get("start_frame")
+        if not isinstance(start_frame, str) or not start_frame:
+            raise ValueError(f"scene {scene_id} requires a start_frame")
+        scenes.append(Scene(scene_id, (root / start_frame).resolve(), tuple(beats)))
+    return tuple(scenes)
+
+
+def continuity_steps(scene: Scene, scene_directory: Path) -> tuple[ContinuityStep, ...]:
+    steps: list[ContinuityStep] = []
+    start = scene.start_frame
+    for index, beat in enumerate(scene.beats):
+        continuity = scene_directory / f"segment-{index + 1:02d}" / "continuity-end.png"
+        steps.append(ContinuityStep(index, start, beat.end_frame, continuity))
+        start = continuity
+    return tuple(steps)
+
+
+def video_matches(path: Path, *, seconds: int, fps: int = DELIVERY_FPS) -> bool:
+    if not path.is_file():
+        return False
+    try:
+        payload = json.loads(subprocess.check_output([
+            "ffprobe", "-v", "error", "-select_streams", "v:0",
+            "-show_entries", "stream=avg_frame_rate,nb_frames:format=duration",
+            "-of", "json", str(path),
+        ]))
+        stream = payload["streams"][0]
+        numerator, denominator = (int(value) for value in stream["avg_frame_rate"].split("/"))
+        actual_fps = numerator / denominator
+        frames = int(stream["nb_frames"])
+        duration = float(payload["format"]["duration"])
+    except (FileNotFoundError, KeyError, ValueError, ZeroDivisionError, subprocess.SubprocessError, json.JSONDecodeError):
+        return False
+    return (
+        abs(actual_fps - fps) < 0.001
+        and frames == seconds * fps
+        and abs(duration - seconds) <= 1 / fps
+    )
+
+
+def extract_last_frame(video: Path, output: Path) -> None:
+    """Decode the actual final frame for use as the next segment boundary."""
+    payload = json.loads(subprocess.check_output([
+        "ffprobe", "-v", "error", "-select_streams", "v:0",
+        "-show_entries", "stream=nb_frames", "-of", "json", str(video),
+    ]))
+    count = int(payload["streams"][0]["nb_frames"])
+    if count < 2:
+        raise RuntimeError(f"Video has too few frames: {video}")
+    subprocess.run([
+        "ffmpeg", "-y", "-v", "error", "-i", str(video),
+        "-vf", f"select=eq(n\\,{count - 1})", "-frames:v", "1", str(output),
+    ], check=True)
+    if not output.is_file():
+        raise RuntimeError(f"Unable to extract continuity frame from {video}")
