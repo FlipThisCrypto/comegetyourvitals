@@ -16,6 +16,8 @@ DELIVERY_FPS = 60
 SCENE_SECONDS = SEGMENT_SECONDS * SEGMENTS_PER_SCENE
 SCENE_FRAMES = SCENE_SECONDS * DELIVERY_FPS
 SCENE_ID = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+ENERGY_LEVELS = {"restrained", "medium", "high", "maximum"}
+CAMERA_MOVES = {"locked_observational", "slow_dolly", "lateral_arc", "performance_orbit", "crane_rise"}
 
 
 @dataclass(frozen=True)
@@ -24,6 +26,10 @@ class Beat:
     end_frame: Path
     singing: bool
     focus: tuple[str, ...]
+    energy: str
+    camera_move: str
+    motion_channels: tuple[str, ...]
+    action_arc: tuple[str, str, str]
 
 
 @dataclass(frozen=True)
@@ -55,6 +61,28 @@ def performance_directive(singing: bool) -> str:
     return (
         "This is a non-singing story and dance passage. No character lip-syncs or holds a microphone; "
         "mouths stay closed or make brief natural non-vocal reactions."
+    )
+
+
+def motion_directive(beat: Beat) -> str:
+    energy = {
+        "restrained": "a restrained, natural and emotionally readable",
+        "medium": "an active, conversational",
+        "high": "a high-energy, rhythmic",
+        "maximum": "a maximum celebratory",
+    }[beat.energy]
+    camera = {
+        "locked_observational": "a stable observational camera with only subtle breathing drift",
+        "slow_dolly": "one continuous slow dolly with coherent foreground and background parallax",
+        "lateral_arc": "one controlled lateral arc that never crosses the established camera axis",
+        "performance_orbit": "one shallow performance orbit that keeps every face readable",
+        "crane_rise": "one smooth low-to-high crane rise with stable horizon and room geometry",
+    }[beat.camera_move]
+    setup, development, payoff = beat.action_arc
+    return (
+        f"Sustain motion for all ten seconds at {energy} level with clear weight shifts and readable faces and limbs. During seconds 0-3: {setup}. "
+        f"During seconds 3-7: {development}. During seconds 7-10: {payoff}. Use {camera}. "
+        f"Keep these independent motion channels active and coherent: {', '.join(beat.motion_channels)}."
     )
 
 
@@ -133,6 +161,10 @@ def load_manifest(path: Path) -> tuple[Scene, ...]:
             singing = raw_beat.get("singing")
             end_frame = raw_beat.get("end_frame")
             raw_focus = raw_beat.get("focus")
+            energy = raw_beat.get("energy")
+            camera_move = raw_beat.get("camera_move")
+            raw_channels = raw_beat.get("motion_channels")
+            raw_arc = raw_beat.get("action_arc")
             if not isinstance(prompt, str) or not prompt.strip():
                 raise ValueError(f"scene {scene_id} beat {index} requires a prompt")
             if not isinstance(singing, bool):
@@ -143,7 +175,23 @@ def load_manifest(path: Path) -> tuple[Scene, ...]:
                 raise ValueError(f"scene {scene_id} beat {index} focus must be a non-empty subset of cast")
             if singing and singer is None:
                 raise ValueError(f"scene {scene_id} beat {index} sings without a designated singer")
-            beats.append(Beat(prompt.strip(), (root / end_frame).resolve(), singing, tuple(raw_focus)))
+            if energy not in ENERGY_LEVELS:
+                raise ValueError(f"scene {scene_id} beat {index} has invalid energy")
+            if camera_move not in CAMERA_MOVES:
+                raise ValueError(f"scene {scene_id} beat {index} has invalid camera_move")
+            if not isinstance(raw_channels, list) or not all(
+                isinstance(channel, str) and channel.strip() for channel in raw_channels
+            ) or len(set(raw_channels)) < 3:
+                raise ValueError(f"scene {scene_id} beat {index} requires at least three unique motion_channels")
+            if not isinstance(raw_arc, dict) or any(
+                not isinstance(raw_arc.get(stage), str) or not raw_arc[stage].strip()
+                for stage in ("setup", "development", "payoff")
+            ):
+                raise ValueError(f"scene {scene_id} beat {index} requires setup, development and payoff action_arc")
+            beats.append(Beat(
+                prompt.strip(), (root / end_frame).resolve(), singing, tuple(raw_focus), energy, camera_move,
+                tuple(raw_channels), tuple(raw_arc[stage].strip() for stage in ("setup", "development", "payoff")),
+            ))
         start_frame = raw.get("start_frame")
         if not isinstance(start_frame, str) or not start_frame:
             raise ValueError(f"scene {scene_id} requires a start_frame")

@@ -26,6 +26,7 @@ from long_scene_contract import (
     identity_directive,
     load_character_registry,
     load_manifest,
+    motion_directive,
     performance_directive,
     video_matches,
 )
@@ -63,7 +64,7 @@ def prompt_for(scene: Scene, beat_index: int, registry: dict[str, dict[str, obje
     return (
         "One uninterrupted ten-second passage from a polished 3D animated underwater nursing-station scene. "
         f"{identity_directive(scene, registry)} The visual focus in this passage is {', '.join(beat.focus)}. "
-        f"{beat.prompt} {performance_directive(beat.singing)} "
+        f"{beat.prompt} {motion_directive(beat)} {performance_directive(beat.singing)} "
         "Maintain one continuous timeline with natural-speed movement and coherent weight. Preserve every established character's "
         "face, species, body proportions, uniform, accessories and screen position. Keep hands, fins, tails, hair and props readable. "
         "The orca, whenever present, is a silent background coworker at the vitals workstation: mouth closed, no microphone, no lip sync. "

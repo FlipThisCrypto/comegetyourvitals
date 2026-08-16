@@ -14,25 +14,57 @@
           "prompt": "The nurses notice the rhythm and exchange amused looks while continuing their work; the camera makes a gentle lateral move.",
           "end_frame": "keyframes/flashmob-10.png",
           "singing": false,
-          "focus": ["NURSE_ORCA", "NURSE_PUFFER"]
+          "focus": ["NURSE_ORCA", "NURSE_PUFFER"],
+          "energy": "medium",
+          "camera_move": "slow_dolly",
+          "motion_channels": ["orca monitor work", "puffer eye and fin reactions", "background bubbles and caustics"],
+          "action_arc": {
+            "setup": "the orca checks the monitor while the puffer notices the beat",
+            "development": "the puffer tests a small dance step and the orca answers with a deadpan nod",
+            "payoff": "both land on a shared reaction as the camera reaches the workstation"
+          }
         },
         {
           "prompt": "Two nurses begin a playful synchronized step in the background while the foreground nurse finishes checking the monitor.",
           "end_frame": "keyframes/flashmob-20.png",
           "singing": false,
-          "focus": ["NURSE_PUFFER", "NURSE_TANG"]
+          "focus": ["NURSE_PUFFER", "NURSE_TANG"],
+          "energy": "high",
+          "camera_move": "lateral_arc",
+          "motion_channels": ["two-nurse synchronized footwork", "hair fins and tails", "background coworker reactions", "camera parallax"],
+          "action_arc": {
+            "setup": "the tang joins the puffer's step without abandoning the workstation",
+            "development": "they build a readable synchronized phrase with distinct poses",
+            "payoff": "they open a lane for the lead's entrance and point toward camera"
+          }
         },
         {
           "prompt": "The female lead enters with the microphone and performs energetically as the background dance grows into a coordinated flash mob.",
           "end_frame": "keyframes/flashmob-30.png",
           "singing": true,
-          "focus": ["NURSE_RAINBOW", "NURSE_PUFFER", "NURSE_TANG"]
+          "focus": ["NURSE_RAINBOW", "NURSE_PUFFER", "NURSE_TANG"],
+          "energy": "high",
+          "camera_move": "performance_orbit",
+          "motion_channels": ["female lead vocal performance", "two-nurse flash-mob choreography", "hair fins and tails", "bubbles caustics and practical lights"],
+          "action_arc": {
+            "setup": "the rainbow lead enters and establishes the vocal phrase",
+            "development": "the background pair answers each lyric with coordinated comic gestures",
+            "payoff": "the trio completes a broad turn and faces front on the beat"
+          }
         },
         {
           "prompt": "The full female nurse ensemble completes a joyful final dance phrase, then lands together in a clean readable pose.",
           "end_frame": "keyframes/flashmob-40.png",
           "singing": true,
-          "focus": ["NURSE_RAINBOW", "NURSE_PUFFER", "NURSE_TANG", "NURSE_ORCA"]
+          "focus": ["NURSE_RAINBOW", "NURSE_PUFFER", "NURSE_TANG", "NURSE_ORCA"],
+          "energy": "maximum",
+          "camera_move": "crane_rise",
+          "motion_channels": ["female lead vocal performance", "ensemble flash-mob choreography", "orca workstation reaction", "hair fins tails and uniforms", "environmental bubbles caustics and lights"],
+          "action_arc": {
+            "setup": "the ensemble expands into the full station while the orca keeps working",
+            "development": "the three performers complete the largest synchronized dance phrase",
+            "payoff": "everyone lands in a clean joyful final pose while the silent orca gives one approving nod"
+          }
         }
       ]
     }

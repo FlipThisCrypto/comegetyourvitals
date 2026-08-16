@@ -35,6 +35,11 @@ class LongScenePreflightTests(unittest.TestCase):
                 "beats": [{
                     "prompt": f"Distinct action {index}", "end_frame": f"end-{index}.png",
                     "singing": index > 1, "focus": ["NURSE_RAINBOW"],
+                    "energy": "high", "camera_move": "lateral_arc",
+                    "motion_channels": ["body", "hair and fins", "environment"],
+                    "action_arc": {
+                        "setup": "begin the action", "development": "develop the action", "payoff": "finish the action"
+                    },
                 } for index in range(4)],
             }],
         }

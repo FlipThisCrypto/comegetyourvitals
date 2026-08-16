@@ -122,7 +122,13 @@ def creative_fingerprint(scene: Scene) -> str:
         "cast": sorted(scene.cast),
         "singer": scene.singer,
         "camera_axis": scene.camera_axis.casefold().strip(),
-        "prompts": [beat.prompt.casefold().strip() for beat in scene.beats],
+        "beats": [{
+            "prompt": beat.prompt.casefold().strip(),
+            "energy": beat.energy,
+            "camera_move": beat.camera_move,
+            "motion_channels": sorted(channel.casefold().strip() for channel in beat.motion_channels),
+            "action_arc": [stage.casefold().strip() for stage in beat.action_arc],
+        } for beat in scene.beats],
     }
     return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
 

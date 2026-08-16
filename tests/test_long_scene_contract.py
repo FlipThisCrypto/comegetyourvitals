@@ -16,6 +16,7 @@ from long_scene_contract import (  # noqa: E402
     identity_directive,
     load_character_registry,
     load_manifest,
+    motion_directive,
     performance_directive,
     video_matches,
     validate_scene_cast,
@@ -38,6 +39,14 @@ class LongSceneContractTests(unittest.TestCase):
                 "beats": [{
                     "prompt": f"Beat {index}", "end_frame": f"end-{index}.png", "singing": index >= 2,
                     "focus": ["NURSE_RAINBOW"],
+                    "energy": "high",
+                    "camera_move": "lateral_arc",
+                    "motion_channels": ["body", "hair and fins", "environment"],
+                    "action_arc": {
+                        "setup": "begin readable action",
+                        "development": "develop the action continuously",
+                        "payoff": "finish in the endpoint pose"
+                    },
                 } for index in range(beats)],
             }],
         }
@@ -87,6 +96,22 @@ class LongSceneContractTests(unittest.TestCase):
         directive = identity_directive(scene, registry)
         self.assertIn("NURSE_ORCA is the orca", directive)
         self.assertIn("sole singer is NURSE_RAINBOW", directive)
+
+    def test_motion_directive_spans_full_ten_seconds(self) -> None:
+        beat = load_manifest(Path("long-scene-manifest.example.json"))[0].beats[0]
+        directive = motion_directive(beat)
+        self.assertIn("seconds 0-3", directive)
+        self.assertIn("seconds 3-7", directive)
+        self.assertIn("seconds 7-10", directive)
+
+    def test_fewer_than_three_motion_channels_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            path = self.manifest(Path(raw))
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            payload["scenes"][0]["beats"][0]["motion_channels"] = ["body", "camera"]
+            path.write_text(json.dumps(payload), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "three unique motion_channels"):
+                load_manifest(path)
 
     def test_40_second_delivery_contract_is_2400_frames(self) -> None:
         self.assertEqual(SCENE_FRAMES, 2400)
