@@ -27,10 +27,10 @@ from long_scene_contract import (
     load_character_registry,
     load_manifest,
     performance_directive,
-    validate_scene_cast,
     video_matches,
 )
 from long_scene_qa import analyze_segment, approval_status, archive_attempt
+from long_scene_preflight import run_preflight
 
 
 WIDTH = 848
@@ -206,7 +206,14 @@ async def worker(
 async def execute(args: argparse.Namespace) -> None:
     scenes = load_manifest(args.manifest)
     registry = load_character_registry(args.character_registry)
-    validate_scene_cast(scenes, registry)
+    run_preflight(
+        scenes,
+        registry,
+        args.output_directory / "preflight-report.json",
+        workflow=args.workflow,
+        rife_runtime=args.rife_runtime,
+        endpoints=(args.endpoint_gpu0, args.endpoint_gpu1),
+    )
     for scene in scenes:
         for frame in (scene.start_frame, *(beat.end_frame for beat in scene.beats)):
             if not frame.is_file():
