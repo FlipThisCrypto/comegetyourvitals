@@ -12,7 +12,7 @@ from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).parents[1] / "scripts"))
 from long_scene_contract import load_character_registry, load_manifest  # noqa: E402
-from long_scene_preflight import run_preflight  # noqa: E402
+from long_scene_preflight import prepare_scenes, run_preflight  # noqa: E402
 
 
 class LongScenePreflightTests(unittest.TestCase):
@@ -98,6 +98,30 @@ class LongScenePreflightTests(unittest.TestCase):
             manifest.write_text(json.dumps(payload), encoding="utf-8")
             with self.assertRaisesRegex(RuntimeError, "duplicates creative definition"):
                 run_preflight(load_manifest(manifest), load_character_registry(registry_path), root / "preflight.json")
+
+    def test_prepared_anchors_are_exact_rgb_without_mutating_sources(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            manifest, registry_path = self.fixture(root)
+            source = load_manifest(manifest)
+            original_start = source[0].start_frame
+            prepared = prepare_scenes(source, root / "prepared")
+            self.assertEqual(source[0].start_frame, original_start)
+            self.assertNotEqual(prepared[0].start_frame, original_start)
+            for path in (prepared[0].start_frame, *(beat.end_frame for beat in prepared[0].beats)):
+                with Image.open(path) as image:
+                    self.assertEqual(image.size, (848, 480))
+                    self.assertEqual(image.mode, "RGB")
+            self.assertTrue((root / "prepared" / "prepared-anchor-index.json").is_file())
+
+    def test_wide_anchor_is_center_cropped_not_stretched(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            manifest, _ = self.fixture(root)
+            Image.new("RGB", (1392, 752), "teal").save(root / "start.png")
+            prepared = prepare_scenes(load_manifest(manifest), root / "prepared")
+            with Image.open(prepared[0].start_frame) as image:
+                self.assertEqual(image.size, (848, 480))
 
 
 if __name__ == "__main__":

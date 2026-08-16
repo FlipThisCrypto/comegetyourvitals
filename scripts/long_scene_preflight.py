@@ -7,12 +7,12 @@ import argparse
 import hashlib
 import json
 import urllib.request
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageOps
 
-from long_scene_contract import Scene, load_character_registry, load_manifest, validate_scene_cast
+from long_scene_contract import Beat, Scene, load_character_registry, load_manifest, validate_scene_cast
 
 
 TARGET_WIDTH = 848
@@ -62,6 +62,58 @@ def check_anchor(path: Path) -> AnchorCheck:
         except (OSError, ValueError) as error:
             errors.append(f"undecodable:{type(error).__name__}")
     return AnchorCheck(str(path), width, height, mode, digest, not errors, tuple(errors))
+
+
+def prepare_anchor(source: Path, destination: Path) -> dict[str, object]:
+    """Create an exact RGB working boundary without stretching the source image."""
+    source_hash = file_sha256(source)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with Image.open(source) as image:
+        prepared = ImageOps.fit(
+            image.convert("RGB"),
+            (TARGET_WIDTH, TARGET_HEIGHT),
+            method=Image.Resampling.LANCZOS,
+            centering=(0.5, 0.5),
+        )
+        prepared.save(destination, format="PNG", optimize=True)
+    with Image.open(destination) as check:
+        if check.size != (TARGET_WIDTH, TARGET_HEIGHT) or check.mode != "RGB":
+            raise RuntimeError(f"prepared anchor violated output contract: {destination}")
+    return {
+        "source": str(source),
+        "source_sha256": source_hash,
+        "prepared": str(destination),
+        "prepared_sha256": file_sha256(destination),
+        "width": TARGET_WIDTH,
+        "height": TARGET_HEIGHT,
+        "mode": "RGB",
+    }
+
+
+def prepare_scenes(scenes: tuple[Scene, ...], output_directory: Path) -> tuple[Scene, ...]:
+    prepared_scenes: list[Scene] = []
+    index: list[dict[str, object]] = []
+    for scene in scenes:
+        scene_directory = output_directory / scene.scene_id
+        start_hash = file_sha256(scene.start_frame)[:12]
+        prepared_start = scene_directory / f"start-{start_hash}.png"
+        index.append(prepare_anchor(scene.start_frame, prepared_start))
+        prepared_beats: list[Beat] = []
+        for beat_index, beat in enumerate(scene.beats, start=1):
+            end_hash = file_sha256(beat.end_frame)[:12]
+            prepared_end = scene_directory / f"end-{beat_index:02d}-{end_hash}.png"
+            index.append(prepare_anchor(beat.end_frame, prepared_end))
+            prepared_beats.append(replace(beat, end_frame=prepared_end.resolve()))
+        prepared_scenes.append(replace(
+            scene, start_frame=prepared_start.resolve(), beats=tuple(prepared_beats)
+        ))
+    output_directory.mkdir(parents=True, exist_ok=True)
+    (output_directory / "prepared-anchor-index.json").write_text(json.dumps({
+        "schema_version": 1,
+        "contract": {"width": TARGET_WIDTH, "height": TARGET_HEIGHT, "mode": "RGB", "resize": "center-crop-lanczos"},
+        "anchors": index,
+    }, indent=2), encoding="utf-8")
+    return tuple(prepared_scenes)
 
 
 def creative_fingerprint(scene: Scene) -> str:
