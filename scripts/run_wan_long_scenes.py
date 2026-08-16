@@ -29,8 +29,9 @@ from long_scene_contract import (
     performance_directive,
     video_matches,
 )
-from long_scene_qa import analyze_segment, approval_status, archive_attempt
+from long_scene_qa import analyze_segment, approval_status, archive_attempt, archive_scene_delivery
 from long_scene_preflight import prepare_scenes, run_preflight
+from long_scene_provenance import attempt_number, build_spec, diversified_seed, spec_matches, write_spec
 
 
 WIDTH = 848
@@ -42,6 +43,7 @@ NEGATIVE = (
     "species change, costume change, sudden age change, male singer, masculine lead singer, orca singing, orca lip sync, "
     "orca holding a microphone, teleportation, disappearing prop, unreadable text, logo, watermark"
 )
+PROVIDER_SETTINGS = {"steps": 24, "cfg": 3.8, "shift": 7.5, "high_noise_end_step": 12}
 
 
 def run(command: list[str]) -> None:
@@ -56,13 +58,9 @@ def post_json(url: str, payload: dict[str, object]) -> None:
         pass
 
 
-def request_for(
-    scene: Scene, beat_index: int, gpu: int, start_asset: str, end_asset: str,
-    registry: dict[str, dict[str, object]],
-) -> FirstLastFrameGenerationRequest:
+def prompt_for(scene: Scene, beat_index: int, registry: dict[str, dict[str, object]]) -> str:
     beat = scene.beats[beat_index]
-    provider_id = f"wan22-flf-gpu{gpu}"
-    prompt = (
+    return (
         "One uninterrupted ten-second passage from a polished 3D animated underwater nursing-station scene. "
         f"{identity_directive(scene, registry)} The visual focus in this passage is {', '.join(beat.focus)}. "
         f"{beat.prompt} {performance_directive(beat.singing)} "
@@ -71,12 +69,19 @@ def request_for(
         "The orca, whenever present, is a silent background coworker at the vitals workstation: mouth closed, no microphone, no lip sync. "
         "Use continuous camera parallax and environmental motion without any internal edit. Finish exactly in the supplied endpoint composition."
     )
+
+
+def request_for(
+    scene: Scene, beat_index: int, gpu: int, start_asset: str, end_asset: str,
+    registry: dict[str, dict[str, object]], attempt: int,
+) -> FirstLastFrameGenerationRequest:
+    provider_id = f"wan22-flf-gpu{gpu}"
     return FirstLastFrameGenerationRequest(
         provider_id=provider_id,
         provider_model=MODEL_IDENTITY,
         start_frame_asset_id=start_asset,
         target_end_frame_asset_id=end_asset,
-        prompt=prompt,
+        prompt=prompt_for(scene, beat_index, registry),
         negative_prompt=NEGATIVE,
         duration_seconds=SEGMENT_SECONDS,
         native_requested_fps=NATIVE_FPS,
@@ -84,11 +89,11 @@ def request_for(
         width=WIDTH,
         height=HEIGHT,
         aspect_ratio="16:9",
-        seed=910_000 + sum(ord(char) for char in scene.scene_id) * 31 + beat_index * 997,
+        seed=diversified_seed(scene.scene_id, beat_index, attempt),
         camera_direction="continuous natural-speed performance camera with coherent parallax",
         interpolation_mode=InterpolationMode.RIFE,
         interpolation_provider_id="rife-local",
-        provider_settings={provider_id: {"steps": 24, "cfg": 3.8, "shift": 7.5, "high_noise_end_step": 12}},
+        provider_settings={provider_id: PROVIDER_SETTINGS},
     )
 
 
@@ -98,24 +103,67 @@ async def generate_scene_natives(
     endpoint = args.endpoint_gpu0 if gpu == 0 else args.endpoint_gpu1
     scene_directory = args.output_directory / scene.scene_id
     scene_directory.mkdir(parents=True, exist_ok=True)
-    final = scene_directory / f"{scene.scene_id}-40s-60fps.mp4"
-    if video_matches(final, seconds=40):
-        print(json.dumps({"resume_scene": scene.scene_id, "gpu": gpu}), flush=True)
-        return
-    provider = ComfyUIWanFirstLastFrameProvider(
-        f"wan22-flf-gpu{gpu}", endpoint=endpoint, workflow_template=args.workflow, gpu_assignment=f"gpu{gpu}"
-    )
-    health = await provider.health()
-    if health.get("ok") is not True:
-        raise RuntimeError({"scene": scene.scene_id, "gpu": gpu, "health": health})
+    provider: ComfyUIWanFirstLastFrameProvider | None = None
     for step in continuity_steps(scene, scene_directory):
         segment_directory = step.continuity_frame.parent
         segment_directory.mkdir(parents=True, exist_ok=True)
         native = segment_directory / "native-8fps.mp4"
         delivery = segment_directory / "delivery-60fps.mp4"
+        spec_path = segment_directory / "generation-spec.json"
+        attempt = attempt_number(segment_directory)
+        provider_id = f"wan22-flf-gpu{gpu}"
+        spec = build_spec(
+            scene_id=scene.scene_id,
+            segment=step.index + 1,
+            attempt=attempt,
+            prompt=prompt_for(scene, step.index, registry),
+            negative_prompt=NEGATIVE,
+            start_frame=step.start_frame,
+            end_frame=step.end_frame,
+            seed=diversified_seed(scene.scene_id, step.index, attempt),
+            model=MODEL_IDENTITY,
+            provider_settings={provider_id: PROVIDER_SETTINGS},
+            width=WIDTH,
+            height=HEIGHT,
+            duration_seconds=SEGMENT_SECONDS,
+            native_fps=NATIVE_FPS,
+            delivery_fps=DELIVERY_FPS,
+        )
+        has_media = native.is_file() or delivery.is_file()
+        if has_media and not spec_matches(spec_path, spec):
+            archive_attempt(segment_directory)
+            archive_scene_delivery(scene_directory)
+            attempt = attempt_number(segment_directory)
+            spec = build_spec(
+                scene_id=scene.scene_id,
+                segment=step.index + 1,
+                attempt=attempt,
+                prompt=prompt_for(scene, step.index, registry),
+                negative_prompt=NEGATIVE,
+                start_frame=step.start_frame,
+                end_frame=step.end_frame,
+                seed=diversified_seed(scene.scene_id, step.index, attempt),
+                model=MODEL_IDENTITY,
+                provider_settings={provider_id: PROVIDER_SETTINGS},
+                width=WIDTH,
+                height=HEIGHT,
+                duration_seconds=SEGMENT_SECONDS,
+                native_fps=NATIVE_FPS,
+                delivery_fps=DELIVERY_FPS,
+            )
+        write_spec(spec_path, spec)
         if not native.is_file() and not video_matches(delivery, seconds=SEGMENT_SECONDS):
+            archive_scene_delivery(scene_directory)
+            if provider is None:
+                provider = ComfyUIWanFirstLastFrameProvider(
+                    provider_id, endpoint=endpoint, workflow_template=args.workflow, gpu_assignment=f"gpu{gpu}"
+                )
+                health = await provider.health()
+                if health.get("ok") is not True:
+                    raise RuntimeError({"scene": scene.scene_id, "gpu": gpu, "health": health})
             request = request_for(
-                scene, step.index, gpu, f"{scene.scene_id}-{step.index}-start", f"{scene.scene_id}-{step.index}-end", registry
+                scene, step.index, gpu, f"{scene.scene_id}-{step.index}-start", f"{scene.scene_id}-{step.index}-end",
+                registry, attempt,
             )
             await provider.generate(
                 ResolvedFirstLastFrameRequest(
@@ -230,6 +278,7 @@ async def execute(args: argparse.Namespace) -> None:
         if scene_id not in scene_lookup or segment not in range(1, 5):
             raise ValueError(f"unknown rerun target: {rerun}")
         archive_attempt(args.output_directory / scene_id / f"segment-{segment:02d}")
+        archive_scene_delivery(args.output_directory / scene_id)
     queue: asyncio.Queue[Scene | None] = asyncio.Queue()
     for scene in scenes:
         queue.put_nowait(scene)

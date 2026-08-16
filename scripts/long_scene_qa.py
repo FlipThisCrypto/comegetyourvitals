@@ -178,12 +178,23 @@ def archive_attempt(segment_directory: Path) -> Path:
     attempt.mkdir()
     for name in (
         "native-8fps.mp4", "delivery-60fps.mp4", "interpolated-fullspeed-60fps.mp4", "continuity-end.png",
-        "qa",
+        "generation-spec.json", "qa",
     ):
         source = segment_directory / name
         if source.exists():
             shutil.move(str(source), str(attempt / name))
     return attempt
+
+
+def archive_scene_delivery(scene_directory: Path) -> Path | None:
+    outputs = list(scene_directory.glob("*-40s-60fps.mp4"))
+    if not outputs:
+        return None
+    archive_root = scene_directory / "stale-assemblies"
+    archive_root.mkdir(parents=True, exist_ok=True)
+    archive = archive_root / f"assembly-{len(list(archive_root.glob('assembly-*'))) + 1:03d}.mp4"
+    shutil.move(str(outputs[0]), str(archive))
+    return archive
 
 
 def main() -> None:

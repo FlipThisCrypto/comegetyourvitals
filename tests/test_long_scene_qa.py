@@ -13,6 +13,7 @@ from long_scene_qa import (  # noqa: E402
     analyze_segment,
     approval_status,
     archive_attempt,
+    archive_scene_delivery,
     record_decision,
     report_fingerprint,
 )
@@ -87,6 +88,16 @@ class LongSceneQaTests(unittest.TestCase):
             self.assertTrue((qa / "review-contact-sheet.jpg").is_file())
             self.assertEqual(len(list((qa / "samples").glob("sample-*.png"))), 20)
             self.assertTrue(report["metrics_pass"])
+
+    def test_stale_scene_delivery_is_archived_recoverably(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            delivery = root / "scene-40s-60fps.mp4"
+            delivery.write_bytes(b"old assembly")
+            archived = archive_scene_delivery(root)
+            self.assertIsNotNone(archived)
+            self.assertEqual(archived.read_bytes(), b"old assembly")
+            self.assertFalse(delivery.exists())
 
 
 if __name__ == "__main__":
