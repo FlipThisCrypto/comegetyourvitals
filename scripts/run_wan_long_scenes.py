@@ -27,6 +27,7 @@ from long_scene_contract import (
     performance_directive,
     video_matches,
 )
+from long_scene_qa import analyze_segment, approval_status, archive_attempt
 
 
 WIDTH = 848
@@ -122,13 +123,14 @@ async def generate_scene_natives(scene: Scene, gpu: int, args: argparse.Namespac
     print(json.dumps({"scene_natives_complete": scene.scene_id, "gpu": gpu}), flush=True)
 
 
-async def deliver_scene(scene: Scene, rife: RifeCliInterpolationProvider, args: argparse.Namespace) -> None:
+async def deliver_scene(scene: Scene, rife: RifeCliInterpolationProvider, args: argparse.Namespace) -> list[str]:
     scene_directory = args.output_directory / scene.scene_id
     final = scene_directory / f"{scene.scene_id}-40s-60fps.mp4"
     if video_matches(final, seconds=40):
-        return
+        return []
     deliveries: list[Path] = []
     report: list[dict[str, object]] = []
+    review_blockers: list[str] = []
     for step in continuity_steps(scene, scene_directory):
         beat = scene.beats[step.index]
         segment_directory = step.continuity_frame.parent
@@ -142,6 +144,13 @@ async def deliver_scene(scene: Scene, rife: RifeCliInterpolationProvider, args: 
             )
         if not video_matches(delivery, seconds=SEGMENT_SECONDS):
             raise RuntimeError(f"Invalid delivery timing: {delivery}")
+        qa_directory = segment_directory / "qa"
+        qa_report = analyze_segment(delivery, step.start_frame, step.end_frame, qa_directory)
+        review = approval_status(qa_directory, qa_report)
+        if review != "approved":
+            review_blockers.append(
+                f"{scene.scene_id}:segment-{step.index + 1:02d} metrics={qa_report['metrics_pass']} review={review}"
+            )
         deliveries.append(delivery)
         report.append({
             "segment": step.index + 1,
@@ -150,7 +159,12 @@ async def deliver_scene(scene: Scene, rife: RifeCliInterpolationProvider, args: 
             "continuity_frame": str(step.continuity_frame),
             "singing": beat.singing,
             "delivery": str(delivery),
+            "qa_report": str(qa_directory / "qa-report.json"),
+            "review": review,
         })
+    if review_blockers:
+        print(json.dumps({"scene_review_required": scene.scene_id, "blockers": review_blockers}), flush=True)
+        return review_blockers
     concat = scene_directory / "concat.txt"
     concat.write_text("".join(f"file '{path.resolve().as_posix()}'\n" for path in deliveries), encoding="utf-8")
     temporary = scene_directory / f".{scene.scene_id}-assembling.mp4"
@@ -161,7 +175,8 @@ async def deliver_scene(scene: Scene, rife: RifeCliInterpolationProvider, args: 
     ]))["streams"][0]["nb_frames"]) != SCENE_FRAMES:
         raise RuntimeError(f"Scene failed the 40-second/2400-frame contract: {final}")
     (scene_directory / "scene-report.json").write_text(json.dumps({"scene": scene.scene_id, "segments": report}, indent=2), encoding="utf-8")
-    print(json.dumps({"scene_complete": scene.scene_id, "gpu": gpu, "output": str(final)}), flush=True)
+    print(json.dumps({"scene_complete": scene.scene_id, "output": str(final)}), flush=True)
+    return []
 
 
 async def worker(gpu: int, queue: asyncio.Queue[Scene | None], args: argparse.Namespace) -> None:
@@ -182,6 +197,16 @@ async def execute(args: argparse.Namespace) -> None:
             if not frame.is_file():
                 raise FileNotFoundError(frame)
     args.output_directory.mkdir(parents=True, exist_ok=True)
+    scene_lookup = {scene.scene_id: scene for scene in scenes}
+    for rerun in args.rerun:
+        try:
+            scene_id, raw_segment = rerun.rsplit(":", 1)
+            segment = int(raw_segment)
+        except (ValueError, TypeError) as error:
+            raise ValueError(f"--rerun must use scene-id:segment-number, got {rerun!r}") from error
+        if scene_id not in scene_lookup or segment not in range(1, 5):
+            raise ValueError(f"unknown rerun target: {rerun}")
+        archive_attempt(args.output_directory / scene_id / f"segment-{segment:02d}")
     queue: asyncio.Queue[Scene | None] = asyncio.Queue()
     for scene in scenes:
         queue.put_nowait(scene)
@@ -197,8 +222,11 @@ async def execute(args: argparse.Namespace) -> None:
         args.rife_runtime / ".venv/bin/python", args.rife_runtime / "inference_video.py", args.rife_runtime / "train_log",
         timeout_seconds=1800,
     )
+    blockers: list[str] = []
     for scene in scenes:
-        await deliver_scene(scene, rife, args)
+        blockers.extend(await deliver_scene(scene, rife, args))
+    if blockers:
+        raise RuntimeError("Visual review required before assembly:\n" + "\n".join(blockers))
 
 
 def main() -> None:
@@ -209,6 +237,7 @@ def main() -> None:
     parser.add_argument("--rife-runtime", type=Path, required=True)
     parser.add_argument("--endpoint-gpu0", default="http://127.0.0.1:8190")
     parser.add_argument("--endpoint-gpu1", default="http://127.0.0.1:8189")
+    parser.add_argument("--rerun", action="append", default=[], help="archive and regenerate scene-id:segment-number")
     args = parser.parse_args()
     asyncio.run(execute(args))
 
