@@ -1,0 +1,71 @@
+{
+  "project": "Come Get Your Vitals",
+  "canonical_orientation": {
+    "left": "residential",
+    "center": "nurses_station",
+    "right": "detox"
+  },
+  "assets": [
+    {
+      "file": "assets/env_outside_fishbowl.png",
+      "type": "environment",
+      "role": "MASTER_GEOGRAPHY",
+      "notes": "Head-on exterior view. Canonical left/right orientation."
+    },
+    {
+      "file": "assets/env_detox_station.png",
+      "type": "environment",
+      "role": "detox_detail",
+      "notes": "Dreary underwater detox station reference."
+    },
+    {
+      "file": "assets/env_detox_window.png",
+      "type": "environment",
+      "role": "detox_window",
+      "notes": "Detox-facing window reference."
+    },
+    {
+      "file": "assets/env_residential_station.png",
+      "type": "environment",
+      "role": "residential_detail",
+      "notes": "Bright, vibrant residential station reference."
+    },
+    {
+      "file": "assets/env_residential_window.png",
+      "type": "environment",
+      "role": "residential_window",
+      "notes": "Residential-facing window reference."
+    },
+    {
+      "file": "assets/char_orca_sheet.png",
+      "type": "character_sheet",
+      "character": "orca_nurse"
+    },
+    {
+      "file": "assets/char_betta_sheet.png",
+      "type": "character_sheet",
+      "character": "betta_nurse"
+    },
+    {
+      "file": "assets/char_puffer_sheet.png",
+      "type": "character_sheet",
+      "character": "puffer_nurse",
+      "special": "must support puffed and unpuffed states"
+    },
+    {
+      "file": "assets/char_rainbow_sheet.png",
+      "type": "character_sheet",
+      "character": "rainbow_nurse"
+    },
+    {
+      "file": "assets/char_tang_sheet.png",
+      "type": "character_sheet",
+      "character": "regal_blue_tang_nurse"
+    },
+    {
+      "file": "assets/char_clown_sheet.png",
+      "type": "character_sheet",
+      "character": "clownfish_nurse"
+    }
+  ]
+}

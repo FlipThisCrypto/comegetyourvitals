@@ -1,0 +1,35 @@
+# Generated and rendered media
+/generated/
+/renders/
+/audio/
+
+# Large source/reference media kept in the production workspace
+*.mp3
+*.wav
+*.flac
+*.m4a
+*.mp4
+*.mov
+*.mkv
+*.avi
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.zip
+
+# Python caches and local environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Editor and OS state
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local iteration prompts and scratch files
+/the 50 iteration plan*.txt

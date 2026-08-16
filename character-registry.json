@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "continuity_rule": "Species, anatomy, scale pattern, eye color, body shape and identifying feature are immutable. Recovery state may change saturation, posture, fin grooming, expression and carried comfort props only.",
+  "nurses": [
+    {
+      "id": "NURSE_ORCA",
+      "species": "orca",
+      "asset": "assets/char_orca_sheet.png",
+      "primary_colors": ["black", "white", "teal-blue scrubs"],
+      "eye_color": "dark brown",
+      "body_shape": "broad, powerful cetacean silhouette",
+      "identifying_feature": "white eye patch and large crescent tail",
+      "personality": "deadpan authority; unflappable until emergency",
+      "animation_tendencies": ["slow decisive turns", "economical flipper gestures", "heavy tail beats", "held reaction looks"]
+    },
+    {
+      "id": "NURSE_BETTA",
+      "species": "betta fish",
+      "asset": "assets/char_betta_sheet.png",
+      "primary_colors": ["electric blue", "midnight blue", "blue scrubs"],
+      "eye_color": "blue",
+      "body_shape": "compact torso with large flowing fins and hair",
+      "identifying_feature": "black-blue updo and layered fan tail",
+      "personality": "poised, sharp, fast technical performer",
+      "animation_tendencies": ["rapid precise lip cadence", "fan-tail waves", "hair follow-through", "pointed hand accents"]
+    },
+    {
+      "id": "NURSE_PUFFER",
+      "species": "pufferfish",
+      "asset": "assets/char_puffer_sheet.png",
+      "primary_colors": ["sand", "navy", "iridescent blue", "blue scrubs"],
+      "eye_color": "blue",
+      "body_shape": "mer-fish silhouette with round puffed state",
+      "identifying_feature": "dark wavy hair with blue highlights and visible puffer spines",
+      "personality": "expressive stress meter; warm but easily incredulous",
+      "animation_tendencies": ["radial inflation", "hair lag", "wide eye pops", "fast fin flutter"]
+    },
+    {
+      "id": "NURSE_RAINBOW",
+      "species": "rainbow mer-fish",
+      "asset": "assets/char_rainbow_sheet.png",
+      "primary_colors": ["indigo", "cyan", "magenta", "gold", "blue scrubs"],
+      "eye_color": "blue",
+      "body_shape": "humanlike upper body with broad iridescent tail",
+      "identifying_feature": "rainbow scale gradient and dark multicolor-highlighted hair",
+      "personality": "emotionally perceptive; hopeful without sentimentality",
+      "animation_tendencies": ["open spiraling swims", "soft eye acting", "slow reassuring gestures", "color-catching tail rolls"]
+    },
+    {
+      "id": "NURSE_TANG",
+      "species": "regal blue tang",
+      "asset": "assets/char_tang_sheet.png",
+      "primary_colors": ["royal blue", "yellow", "black", "blue scrubs"],
+      "eye_color": "blue",
+      "body_shape": "athletic humanlike torso with blade-shaped tang tail",
+      "identifying_feature": "yellow fins, blue skin and white flower",
+      "personality": "confident, kinetic, chorus-ready",
+      "animation_tendencies": ["quick direction changes", "athletic kick turns", "phone and clipboard business", "shoulder-led groove"]
+    },
+    {
+      "id": "NURSE_CLOWN",
+      "species": "clownfish",
+      "asset": "assets/char_clown_sheet.png",
+      "primary_colors": ["orange", "white", "black", "orange scrubs"],
+      "eye_color": "brown",
+      "body_shape": "humanlike torso with compact striped tail fins",
+      "identifying_feature": "orange-white-black tail panels and highlighted brown hair",
+      "personality": "playful, expressive, intake-chaos comic timing",
+      "animation_tendencies": ["bouncy anticipation", "fast blinks", "small tail flicks", "prop-based punchlines"]
+    }
+  ],
+  "clients": [
+    {
+      "id": "CLIENT_01", "name": "Mara", "species": "copperband butterflyfish", "scale_pattern": "five vertical copper bands on cream", "primary_colors": ["cream", "copper", "charcoal"], "eye_color": "amber", "body_shape": "tall, narrow disc with long snout", "identifying_feature": "black crescent eyespot at tail base", "detox_appearance": "bands desaturated; low curled posture; blanket, wristband and belongings bag", "stabilization_appearance": "level hover; smoother fin edges; direct but cautious eye contact", "residential_appearance": "warm copper returns; upright fins; steady purposeful swimming", "personality": "observant, guarded, unexpectedly dry humor", "animation_tendencies": ["small precise fin strokes", "long-snouted side-eye", "slow posture lift"]
+    },
+    {
+      "id": "CLIENT_02", "name": "Drew", "species": "oscar cichlid", "scale_pattern": "burnt-orange marbling on charcoal", "primary_colors": ["charcoal", "burnt orange"], "eye_color": "hazel", "body_shape": "broad, heavy oval", "identifying_feature": "small notch in dorsal fin", "detox_appearance": "marbling nearly black; body grounded; water cup and blanket", "stabilization_appearance": "hovering under own power; orange pattern visible", "residential_appearance": "full marbling; powerful relaxed tail beats", "personality": "blunt, skeptical, protective once engaged", "animation_tendencies": ["weighty tail strokes", "jaw-set reactions", "shoulder-like body rolls"]
+    },
+    {
+      "id": "CLIENT_03", "name": "Sam", "species": "Moorish idol", "scale_pattern": "black-white bands with yellow saddle", "primary_colors": ["black", "ivory", "yellow"], "eye_color": "violet-gray", "body_shape": "very tall triangular body with long dorsal streamer", "identifying_feature": "asymmetric black cheek marking", "detox_appearance": "streamer droops; yellow muted; curled over cup", "stabilization_appearance": "streamer lifts and eye contact returns", "residential_appearance": "clean high-contrast bands; streamer trails through confident turns", "personality": "anxious talker who becomes a thoughtful group participant", "animation_tendencies": ["streamer follow-through", "fluttery starts", "eventual smooth glides"]
+    },
+    {
+      "id": "CLIENT_04", "name": "Quinn", "species": "yellow-green boxfish", "scale_pattern": "dark freckles over yellow-green armor", "primary_colors": ["olive", "yellow", "cream"], "eye_color": "brown", "body_shape": "compact squared box", "identifying_feature": "pale diamond patch on left flank", "detox_appearance": "olive-gray; tucked fins; blanket and bag", "stabilization_appearance": "fins extend; hovering curiosity", "residential_appearance": "bright yellow-green; brisk comic fin paddling", "personality": "quiet, literal, accidentally funny", "animation_tendencies": ["tiny rapid fin beats", "rigid-body pivots", "slow blink punchlines"]
+    },
+    {
+      "id": "CLIENT_05", "name": "Lee", "species": "silver arowana", "scale_pattern": "large silver plates", "primary_colors": ["silver", "pewter", "copper"], "eye_color": "pale blue", "body_shape": "long sleek torpedo with upturned mouth", "identifying_feature": "copper scale cluster behind right gill", "detox_appearance": "dull pewter; rests on blanket with bag", "stabilization_appearance": "long body straightens; copper cluster catches light", "residential_appearance": "bright silver; deliberate open-water glides", "personality": "reserved, proud, dependable", "animation_tendencies": ["whole-spine swimming wave", "minimal facial acting", "long depth passes"]
+    },
+    {
+      "id": "CLIENT_06", "name": "Avery", "species": "purple firefish", "scale_pattern": "lavender body grading to magenta fins", "primary_colors": ["lavender", "violet", "magenta", "red"], "eye_color": "amber", "body_shape": "slender dart with high split dorsal flag", "identifying_feature": "tiny white chin spot", "detox_appearance": "dorsal flag folded; muted violet; blanket and cup", "stabilization_appearance": "flag partially raised; curious forward posture", "residential_appearance": "saturated purple-red; fast clean swimming arcs", "personality": "frightened at first, later quick-witted and social", "animation_tendencies": ["dart-and-hover", "dorsal flag accents", "fast eye darts"]
+    },
+    {
+      "id": "CLIENT_07", "name": "Nico", "species": "California sheephead wrasse", "scale_pattern": "black body with crimson head and pale collar", "primary_colors": ["black", "crimson", "gray"], "eye_color": "gray-green", "body_shape": "large powerful oval with blunt forehead", "identifying_feature": "pale vertical collar stripe", "detox_appearance": "head darkened; chin on folded fins; blanket and cup", "stabilization_appearance": "collar sharpens; body lifts", "residential_appearance": "rich crimson face; controlled strong swimming", "personality": "intimidating silhouette, gentle presence, helps others", "animation_tendencies": ["slow power strokes", "protective positioning", "small soft eye movements"]
+    },
+    {
+      "id": "CLIENT_08", "name": "June", "species": "golden koi", "scale_pattern": "white-gold scales with red shoulder patch", "primary_colors": ["white", "gold", "red"], "eye_color": "sea green", "body_shape": "rounded body with long flowing fins", "identifying_feature": "heart-shaped red scale patch near dorsal shoulder", "detox_appearance": "gold muted; fins pooled; belongings sack and blanket", "stabilization_appearance": "fins separate and eye contact warms", "residential_appearance": "luminous gold; flowing group swims", "personality": "warm, candid, still prone to difficult days", "animation_tendencies": ["flowing fin overlap", "gentle body undulation", "supportive proximity"]
+    },
+    {
+      "id": "CLIENT_09", "name": "Tess", "species": "sable sea catfish", "scale_pattern": "solid charcoal-blue with pale front-fin tips", "primary_colors": ["charcoal", "navy", "cream"], "eye_color": "gold", "body_shape": "low broad catfish silhouette", "identifying_feature": "small nick in left whisker", "detox_appearance": "nearly black; whiskers low; blanket and cup", "stabilization_appearance": "gold eyes lift; whiskers test the water", "residential_appearance": "navy highlights return; steady bottom-to-midwater travel", "personality": "wary, practical, notices everything", "animation_tendencies": ["whisker secondary motion", "low cruising", "single-brow reactions"]
+    },
+    {
+      "id": "CLIENT_10", "name": "Cal", "species": "lined seahorse", "scale_pattern": "ochre armor with teal seams", "primary_colors": ["ochre", "gold", "teal"], "eye_color": "violet", "body_shape": "upright S-curve with curled prehensile tail", "identifying_feature": "spiral marking on lower tail", "detox_appearance": "head bowed; tail tightly coiled; wristband", "stabilization_appearance": "torso lengthens; tail loosens", "residential_appearance": "gold-teal contrast returns; upright purposeful drift", "personality": "methodical, shy, quietly persistent", "animation_tendencies": ["tail uncoiling", "independent eye tracking", "small dorsal-fin vibration"]
+    }
+  ]
+}

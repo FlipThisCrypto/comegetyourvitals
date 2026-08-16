@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "project": "COME GET YOUR VITALS",
+  "seed": 73184,
+  "orientation": {
+    "left": "residential",
+    "center": "nurses_station",
+    "right": "detox"
+  },
+  "timeline": {
+    "audio": "audio/come_get_your_vitals.mp3",
+    "analysis": "generated/audio-analysis.json",
+    "shot_plan": "generated/revised-shot-plan.csv",
+    "fps": 30,
+    "width": 1920,
+    "height": 1080,
+    "duration_seconds": 250.840167,
+    "frame_count": 7525
+  },
+  "render": {
+    "native_width": 1920,
+    "native_height": 1080,
+    "working_width": 960,
+    "working_height": 540,
+    "preview_scale": 0.666667,
+    "chunk_frames": 150,
+    "resume": true,
+    "shardable": true,
+    "atomic_manifests": true,
+    "offline_final": true,
+    "preview": {
+      "codec": "libx264",
+      "crf": 23,
+      "pixel_format": "yuv420p",
+      "audio_codec": "aac",
+      "audio_bitrate": "192k"
+    },
+    "master": {
+      "codec": "libx264",
+      "crf": 16,
+      "pixel_format": "yuv420p",
+      "audio_codec": "aac",
+      "audio_bitrate": "320k"
+    },
+    "mezzanine": {
+      "codec": "prores_ks",
+      "profile": 3,
+      "pixel_format": "yuv422p10le",
+      "audio_codec": "pcm_s24le"
+    }
+  },
+  "motion_qa": {
+    "min_channels_normal": 3,
+    "min_channels_hero": 4,
+    "min_channels_bridge": 2,
+    "max_static_frames": 12,
+    "sample_width": 320,
+    "sample_height": 180,
+    "min_mean_delta_12": 0.65,
+    "require_no_frame_gaps": true,
+    "require_audio_video_match_within_frames": 1
+  },
+  "creative_arc": {
+    "opening_state": "detox",
+    "midpoint_transition_seconds": 125.4200835,
+    "bridge_start_seconds": 142.06,
+    "residential_dominant_from_seconds": 175.5,
+    "final_traversal_start_seconds": 204.46,
+    "final_traversal_end_seconds": 229.34,
+    "states": ["SURVIVING", "STABILIZING", "LIVING", "END"]
+  },
+  "policies": {
+    "important_text_rendered_in_code": true,
+    "no_phi": true,
+    "fictional_clients_only": true,
+    "no_external_network_during_render": true,
+    "no_generated_video_inbetweens": true,
+    "no_static_slideshow_shots": true,
+    "canonical_nurse_designs_locked": true,
+    "character_registry_required": true
+  },
+  "gates": {
+    "required_loops": 3,
+    "iterations_per_loop": 50,
+    "full_render_requires_all_iterations": true,
+    "full_render_requires_preflight": true,
+    "full_render_requires_motion_qa": true
+  }
+}

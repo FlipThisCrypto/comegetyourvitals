@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "style": {
+    "target": "original premium theatrical stylized 3D cartoon",
+    "copyright_constraint": "original world; no imitation of a named studio film or character",
+    "adult_characters_only": true,
+    "non_stigmatizing_clients": true
+  },
+  "camera": {
+    "detox_lens_mm": [50, 70],
+    "center_lens_mm": [35, 50],
+    "residential_lens_mm": [24, 35],
+    "bridge_lens_mm": [65, 85],
+    "max_roll_degrees": 2.5,
+    "depth_planes": 5,
+    "glass_crossing_seconds": 0.9,
+    "rack_focus_enabled": true,
+    "foreground_occlusion_enabled": true
+  },
+  "water": {
+    "detox": {"clarity": 0.28, "particle_density": 1.0, "bubble_density": 0.55, "caustic_strength": 0.28, "hue": "#173b49"},
+    "center": {"clarity": 0.62, "particle_density": 0.55, "bubble_density": 0.78, "caustic_strength": 0.62, "hue": "#1d7182"},
+    "residential": {"clarity": 0.91, "particle_density": 0.23, "bubble_density": 1.0, "caustic_strength": 0.94, "hue": "#38c9c1"},
+    "bridge": {"clarity": 0.76, "particle_density": 0.18, "bubble_density": 0.20, "caustic_strength": 0.35, "hue": "#64828a"}
+  },
+  "lighting": {
+    "detox": {"key": "#a8d8e2", "fill": "#18353f", "warmth": 0.12, "contrast": 1.22, "flicker": 0.035},
+    "center": {"key": "#b5edf1", "fill": "#255f70", "warmth": 0.43, "contrast": 1.08, "flicker": 0.012},
+    "residential": {"key": "#fff1ba", "fill": "#34aeb7", "warmth": 0.82, "contrast": 1.03, "flicker": 0.0},
+    "bridge": {"key": "#d7e2df", "fill": "#526a70", "warmth": 0.36, "contrast": 0.94, "flicker": 0.0}
+  },
+  "character_motion": {
+    "blink_interval_seconds": [2.7, 5.2],
+    "blink_duration_seconds": 0.11,
+    "tail_frequency_hz": [0.65, 1.85],
+    "hair_lag_seconds": 0.12,
+    "fin_lag_seconds": 0.08,
+    "body_bob_pixels": [2, 8],
+    "mouth_visemes": ["closed", "small", "wide", "round", "teeth"],
+    "puffer_inflation_seconds": 0.42,
+    "minimum_face_controls": 4,
+    "minimum_body_joints": 5
+  },
+  "client_states": {
+    "detox": {"saturation": 0.58, "posture": 0.22, "eye_brightness": 0.54, "fin_integrity": 0.62, "swim_energy": 0.28},
+    "stabilizing": {"saturation": 0.78, "posture": 0.61, "eye_brightness": 0.76, "fin_integrity": 0.82, "swim_energy": 0.58},
+    "residential": {"saturation": 1.0, "posture": 0.88, "eye_brightness": 0.95, "fin_integrity": 0.96, "swim_energy": 0.86}
+  },
+  "environment_motion": {
+    "plant_sway_channels": 3,
+    "bubble_depth_bands": 4,
+    "particle_depth_bands": 3,
+    "caustic_octaves": 3,
+    "paper_motion": true,
+    "monitor_animation": true,
+    "door_animation": true,
+    "cart_animation": true,
+    "background_fish_traffic": true,
+    "refraction_enabled": true,
+    "reflection_enabled": true
+  },
+  "performance": {
+    "tempo_bpm": 152,
+    "lip_sync_source": "generated/audio-analysis.json",
+    "beat_grid_source": "generated/audio-analysis.json",
+    "hero_nurses": ["NURSE_BETTA", "NURSE_PUFFER", "NURSE_ORCA", "NURSE_RAINBOW"],
+    "bridge_client": "CLIENT_01",
+    "ensemble_clients": ["CLIENT_01", "CLIENT_03", "CLIENT_06", "CLIENT_08", "CLIENT_09"]
+  }
+}

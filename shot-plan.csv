@@ -1,0 +1,41 @@
+id,section,concept,action,characters,location,required_motion_channels,notes
+S01,Intro,Outside fishbowl master,Slow push toward glass; waterline and reflections move; nurses visible in depth,all silhouettes,outside master,"camera,refraction,bubbles,character micro-motion",Establish LEFT residential / RIGHT detox
+S02,Intro,Camera passes through aquarium glass,Continuous refractive transition into station,"betta,orca",outside + station,"camera,glass refraction,particles,hair/tails",No cut disguised as glass pass
+S03,Intro,Pulse ox search gag,Pulse ox drifts past behind nurse while she searches,puffer,center,"arm/head rig,pulse-ox prop,bubbles,caustics",Fast visual joke
+S04,Verse 1,Come get your vitals performance,"Betta leads, cuff inflates rhythmically, waveform typography pulses",betta,center,"lip/head/body,cuff,typography,camera",Hero performance
+S05,Verse 1,Medication negotiation at window,Client-fish silhouettes gather outside glass; nurse checks coded MAR,orca,detox window,"orca rig,client silhouettes,UI,bubbles",No real patient data
+S06,Verse 1,Provider said...,Nurse deadpan turns to camera; phone/radio indicates she already checked,orca,center,"face/head,radio,background traffic",Hold punchline half-beat
+S07,Verse 1,Chest tight / constipation,"Two quick visual metaphors, no graphic imagery","clown,puffer",detox,"character acting,props,camera,particles",Keep slapstick
+S08,Verse 1,Don't miss group,Client-fish points toward group room while hovering at med window,clown,center/res,"character rig,signage,door activity,bubbles",Typeset group sign
+S09,Verse 1,Pulse ox missing,Object floats directly behind staff in a loop,"puffer,betta",center,"prop path,eye darts,hair,caustics",Recurring gag
+S10,Verse 1,They think they nurses,Rapid mock-diagnostic tableau with harmless generic icons,ensemble,residential,"ensemble acting,UI icons,camera",No real diagnosis
+S11,Pre-Chorus,MAR / door / radio multitask,Three-direction choreography builds pressure,"betta,puffer",center,"arms/head,radio,papers,camera",Puffer begins inflating
+S12,Pre-Chorus,INTAKE'S HERE,Micro-freeze then explosive environmental reaction,ensemble,center,"puffer morph,lights,papers,bubbles,camera",Signature gag
+S13,Chorus,Come Get Your Vitals ensemble,Orbiting wide choreography through central station,ensemble,center,"character rigs,camera,bubbles,caustics,props",Big anthem
+S14,Chorus,Can't prescribe willingness,Camera looks through glass at hesitant client silhouette,rainbow,residential window,"face/hand,tiny client motion,light,particles",Humanize moment
+S15,Chorus,Code Blue tucked behind smart mouth,Orca snaps into emergency-ready pose; red-blue waveform graphic,orca,detox,"body rig,medical bag,graphic,camera","Urgent, not graphic"
+S16,Chorus,I CAN AND I WILL,Residential color blooms toward center; upward swimming movement,"rainbow,betta",center/res,"color/light,characters,camera,bubbles",First major hope burst
+S17,Verse 2,Valium / muscle relaxers,Requests represented as floating generic word bubbles that nurse dismisses,tang,center,"hand/head,text,bubbles,camera",No pill glamour
+S18,Verse 2,Crops were dusted,Everyone reacts to an offscreen odor with exaggerated fish-face comedy,ensemble,center,"faces,tails,particles,camera",No literal bodily-fluid visual
+S19,Verse 2,Faking a seizure,Obvious slapstick fake-out followed by nurse deadpan,"orca,puffer",detox,"acting,camera,props",No realistic medical misinformation
+S20,Verse 2,Bra catastrophe,Laundry/wardrobe item floats by like a dramatic emergency flag,clown,residential,"cloth prop,character acting,bubbles",Harmless visual
+S21,Verse 2,Keep twenty people medically... Alive,"Camera tracks frantic station, then hard stops on word ALIVE",ensemble,center,"multi-character,props,camera,typography",Punchline pacing
+S22,Verse 2,Dark works twelve-hour shifts,Detox side clock/light transition; nurse keeps working,orca,detox,"clock,light,character,camera",Gallows humor
+S23,Verse 2,Chaos clocks in,Literal tiny CHAOS timecard punches clock; puffer inflates,puffer,center,"prop animation,puffer morph,camera,bubbles",Strong comic insert
+S24,Chorus 2,Repeat anthem with escalated choreography,"More continuous movement, fewer repeated angles",ensemble,whole set,"ensemble,camera,environment,typography",Do not reuse S13 wholesale
+S25,Bridge,Hardest one ain't screaming,Motion and saturation drop; close eye-level shot,rainbow,residential,"micro-face,hair,particles,slow camera",Emotional grammar change
+S26,Bridge,It can happen to anybody,Different fish silhouettes cross same shaft of light,ensemble silhouettes,whole set,"silhouettes,light,particles,camera",Universal without stereotypes
+S27,Bridge,Take another...,"Quiet montage of pressure cuff, intake clipboard, provider glance","betta,orca",center,"hands/props,eye acting,slow camera",No rapid cuts
+S28,Bridge,They come back,Former client-fish returns to glass from clear water,rainbow,residential window,"client swim,face/hand,light,bubbles",No text needed
+S29,Bridge,"Thank you, I'm still clean","Two-shot through glass, restrained reaction",rainbow,residential window,"faces,hands,hair,particles",Emotional peak
+S30,Beat Return,Beat slams back,Whip through glass into full-color center,ensemble,center,"camera,refraction,lights,characters",Major transition
+S31,Final Verse,High we don't dispense,Medication cart passes foreground while recovery imagery moves opposite,"betta,tang",center,"camera,cart,characters,bubbles",Double meaning
+S32,Final Verse,Get their name back piece by part,Abstract name-tag letters assemble into 'ME' or neutral identity symbol,rainbow,residential,"typography,character,camera,particles",Avoid real names
+S33,Final Verse,Pulse vs being free,Pulse line transforms into swimming path toward open clear water,rainbow,residential,"graphic morph,swim,camera,light",Visual thesis
+S34,Final Verse,Code Blue / truth / chaos,Three rapid coded visual states,"orca,puffer,betta",whole set,"lighting,characters,typography,camera","Readable, controlled"
+S35,Final Verse,Where's the provider?,All nurses look in different directions in perfect sync,ensemble,center,"head turns,eyes,tails,camera",Comedy reset
+S36,Final Chorus,Long traversal detox to residential,One continuous shot travels RIGHT detox through center to LEFT residential,ensemble,whole set,"camera,ensemble,environment,light",Do not reverse orientation
+S37,Final Chorus,Recovery can too,"Color and clear water overtake center, not detox entirely",ensemble,whole set,"light/color,characters,bubbles,camera",Hope without erasing detox
+S38,Final Chorus,CODE BLUE,Fast emergency tableau resolved into performance pose,"orca,betta",center,"characters,lights,camera,graphic",No gore
+S39,Final Chorus,DON'T BE A MELODY,Inside-joke hero freeze only after a short real-motion lead-in,ensemble,center,"character lead-in,typography,bubbles",Freeze <=12 frames
+S40,Outro,Intake's here... Goddammit,Water calms; radio chirps; everyone reacts; puffer instantly inflates; cut black,ensemble,center,"radio,puffer morph,faces,bubbles",Final comic button

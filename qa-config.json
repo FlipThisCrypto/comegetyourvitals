@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "video": {
+    "required_fps": 30,
+    "master_width": 1920,
+    "master_height": 1080,
+    "preview_width": 1280,
+    "preview_height": 720,
+    "max_duration_error_frames": 1,
+    "require_audio": true,
+    "require_video": true
+  },
+  "motion": {
+    "analysis_width": 320,
+    "analysis_height": 180,
+    "static_adjacent_threshold": 0.22,
+    "max_static_run_frames": 12,
+    "min_mean_delta_12": 0.65,
+    "min_mean_delta_24": 0.85,
+    "sample_offsets": [1, 12, 24]
+  },
+  "creative": {
+    "required_sample_times": [0.5, 8.76, 56.4, 82.0, 142.06, 152.54, 168.94, 175.5, 204.46, 224.78, 229.34, 233.1, 237.66, 240.94],
+    "detox_sample_time": 15.0,
+    "bridge_sample_time": 154.0,
+    "residential_sample_time": 226.5,
+    "black_start_time": 241.74,
+    "require_orientation": "Residential LEFT / Center / Detox RIGHT"
+  },
+  "delivery": {
+    "master_file": "renders/master_1080p.mp4",
+    "preview_file": "renders/preview_720p.mp4",
+    "mezzanine_file": "renders/master_1080p_prores.mov",
+    "contact_sheet": "renders/contact_sheet.jpg",
+    "shot_report": "generated/shot-report.json",
+    "qa_report": "generated/full-motion-qa.json",
+    "checksum_manifest": "generated/delivery-checksums.json"
+  }
+}

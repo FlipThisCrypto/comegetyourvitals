@@ -1,0 +1,24 @@
+{
+  "video": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "target_bpm": 150,
+    "duration_source": "audio_file"
+  },
+  "audio_candidates": [
+    "audio/come_get_your_vitals.wav",
+    "audio/come_get_your_vitals.mp3"
+  ],
+  "render": {
+    "preview_crf": 23,
+    "master_crf": 16,
+    "pixel_format": "yuv420p"
+  },
+  "motion_qa": {
+    "min_independent_channels_normal": 3,
+    "min_independent_channels_hero": 4,
+    "max_static_fullframe_frames": 12
+  },
+  "seed": 73184
+}
